@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/TransferWiseClient/bin/Debug/net5.0
+/TransferWiseClient/obj
+/.vs/TransferWiseClient/v17
+/.vs/slnx.sqlite
