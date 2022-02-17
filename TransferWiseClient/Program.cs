@@ -15,25 +15,23 @@ namespace TransferWiseClient
             var transferWiseService = new TransferWiseService(client);
             var transferWiseSimulationService = new TransferWiseSimulationService(client);
 
-            //var profileId = transferWiseService.GetProfile().Result;
+            var profileId = transferWiseService.GetProfile().Result;
 
-            //var quoteId = transferWiseService.CreateQuote(10, profileId).Result;
+            var quoteId = transferWiseService.CreateQuote(10, profileId).Result;
 
-            //var recipientId = transferWiseService.GetRecipient().Result;
+            var recipientId = transferWiseService.GetRecipient().Result;
 
-            //var transferId = transferWiseService.CreateTransfer(recipientId, quoteId).Result;
+            var transferId = transferWiseService.CreateTransfer(recipientId, quoteId).Result.ToString();
 
-            //var transferStatus = transferWiseService.FundTransfer(profileId, transferId.ToString()).Result;
+            var transferStatus = transferWiseService.FundTransfer(profileId, transferId).Result;
 
-            //Console.WriteLine($"Transfer Status: {transferStatus}");
-
-            //var getTransferStatus = transferWiseService.GetTransferStatus(transferId.ToString()).Result;
-
-            //Happy Path
-            
-            var transferId = "";
+            Console.WriteLine($"Transfer Status: {transferStatus}");
 
             var getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+
+            //Happy Path
+
+            //var transferId = "";
 
             var setStatusResponse = transferWiseSimulationService.SetTransferStatusProcessing(transferId);
 
@@ -49,13 +47,13 @@ namespace TransferWiseClient
 
             // Unhappy Paths
 
-            setStatusResponse = transferWiseSimulationService.SetTransferStatusFundsRefunded(transferId);
+            //setStatusResponse = transferWiseSimulationService.SetTransferStatusFundsRefunded(transferId);
 
-            getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+            //getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
 
-            setStatusResponse = transferWiseSimulationService.SetTransferStatusOutgoingBouncedBack(transferId);
+            //setStatusResponse = transferWiseSimulationService.SetTransferStatusOutgoingBouncedBack(transferId);
 
-            getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+            //getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
         }
     }
 }
