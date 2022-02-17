@@ -67,7 +67,7 @@ namespace TransferWiseClient
             return transfer.id;
         }
 
-        public async Task<string> FundTransfer(int profileId, string transferId)
+        public async Task<string> FundTransfer(int profileId, int transferId)
         {
             var fundTransferRequests = new FundTransferRequest { type = "BALANCE" };
 
@@ -75,18 +75,18 @@ namespace TransferWiseClient
 
             var transfer = await ApiHttpClient.GetAsAsync<FundTransferResponse>(fundTransferResponse.Content);
 
+            Console.WriteLine($"Transfer Status: {transfer.status}");
+
             return transfer.status;
         }
 
-        public async Task<string> FundTransfer(string transferId)
+        public async Task<List<TransferStatusResponse>> GetTransfers()
         {
-            var fundTransferRequests = new FundTransferRequest { type = "BALANCE" };
+            var fundTransferResponse = await _apiHttpClient.SendAsync($"/v1/transfers/", HttpMethod.Get);
 
-            var fundTransferResponse = await _apiHttpClient.SendAsync(fundTransferRequests, $"/v1/transfers/{transferId}", HttpMethod.Get);
+            var transfers = await ApiHttpClient.GetAsAsync<List<TransferStatusResponse>>(fundTransferResponse.Content);
 
-            var transfer = await ApiHttpClient.GetAsAsync<FundTransferResponse>(fundTransferResponse.Content);
-
-            return transfer.status;
+            return transfers;
         }
 
         public async Task<TransferStatusResponse> GetTransferStatus(string transferId)
@@ -94,6 +94,8 @@ namespace TransferWiseClient
             var fundTransferResponse = await _apiHttpClient.SendAsync($"/v1/transfers/{transferId}", HttpMethod.Get);
 
             var transfer = await ApiHttpClient.GetAsAsync<TransferStatusResponse>(fundTransferResponse.Content);
+
+            Console.WriteLine($"Transfer Id {transferId} is status {transfer.status}");
 
             return transfer;
         }

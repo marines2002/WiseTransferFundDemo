@@ -13,7 +13,7 @@ namespace TransferWiseClient
         private HttpClient Client { get; }
 
         string baseUrl = "https://api.sandbox.transferwise.tech";
-        string token = "4784b7b4-cf95-4b16-a1cc-56ce06c412da";
+        string token = "add your api token here";
 
         public ApiHttpClient()
         {

@@ -1,59 +1,52 @@
 ﻿using System;
-using System.Net.Http;
-using TransferWiseClient.Models;
+using System.Threading.Tasks;
 
 namespace TransferWiseClient
 {
     internal class Program
     {
+        private static readonly ApiHttpClient Client = new();
+        private static readonly TransferWiseService TransferWiseService = new(Client);
+        private static readonly TransferWiseSimulationService TransferWiseSimulationService = new(Client);
+
         static void Main(string[] args)
         {
             Console.WriteLine("TransferWise Client");
 
-            var client = new ApiHttpClient();
+            var transferId = CreateAndFundTransfer().Result;
 
-            var transferWiseService = new TransferWiseService(client);
-            var transferWiseSimulationService = new TransferWiseSimulationService(client);
+            SimualatePaymentProcess(transferId).GetAwaiter().GetResult();
+        }
+        private static async Task<string> CreateAndFundTransfer()
+        {
+            var profileId = await TransferWiseService.GetProfile();
 
-            var profileId = transferWiseService.GetProfile().Result;
+            var quoteId = await TransferWiseService.CreateQuote(10, profileId);
 
-            var quoteId = transferWiseService.CreateQuote(10, profileId).Result;
+            var recipientId = await TransferWiseService.GetRecipient();
 
-            var recipientId = transferWiseService.GetRecipient().Result;
+            var transferId = await TransferWiseService.CreateTransfer(recipientId, quoteId);
 
-            var transferId = transferWiseService.CreateTransfer(recipientId, quoteId).Result.ToString();
+            await TransferWiseService.FundTransfer(profileId, transferId);
 
-            var transferStatus = transferWiseService.FundTransfer(profileId, transferId).Result;
+            return transferId.ToString();
+        }
 
-            Console.WriteLine($"Transfer Status: {transferStatus}");
+        private static async Task SimualatePaymentProcess(string transferId)
+        {
+            var getTransferStatus = await TransferWiseService.GetTransferStatus(transferId);
 
-            var getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+            var setStatusResponse = await TransferWiseSimulationService.SetTransferStatusProcessing(transferId);
 
-            //Happy Path
+            getTransferStatus = await TransferWiseService.GetTransferStatus(transferId);
 
-            //var transferId = "";
+            setStatusResponse = await TransferWiseSimulationService.SetTransferStatusFundsConverted(transferId);
 
-            var setStatusResponse = transferWiseSimulationService.SetTransferStatusProcessing(transferId);
+            getTransferStatus = await TransferWiseService.GetTransferStatus(transferId);
 
-            getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+            setStatusResponse = await TransferWiseSimulationService.SetTransferStatusOutgoingPaymentSent(transferId);
 
-            setStatusResponse = transferWiseSimulationService.SetTransferStatusFundsConverted(transferId);
-
-            getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
-
-            setStatusResponse = transferWiseSimulationService.SetTransferStatusOutgoingPaymentSent(transferId);
-            
-            getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
-
-            // Unhappy Paths
-
-            //setStatusResponse = transferWiseSimulationService.SetTransferStatusFundsRefunded(transferId);
-
-            //getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
-
-            //setStatusResponse = transferWiseSimulationService.SetTransferStatusOutgoingBouncedBack(transferId);
-
-            //getTransferStatus = transferWiseService.GetTransferStatus(transferId).Result;
+            getTransferStatus = await TransferWiseService.GetTransferStatus(transferId);
         }
     }
 }
