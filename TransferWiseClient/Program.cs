@@ -15,7 +15,7 @@ namespace TransferWiseClient
 
             var transferId = CreateAndFundTransfer().Result;
 
-            SimualatePaymentProcess(transferId).GetAwaiter().GetResult();
+            SimulatePaymentProcess(transferId).GetAwaiter().GetResult();
         }
         private static async Task<string> CreateAndFundTransfer()
         {
@@ -32,7 +32,7 @@ namespace TransferWiseClient
             return transferId.ToString();
         }
 
-        private static async Task SimualatePaymentProcess(string transferId)
+        private static async Task SimulatePaymentProcess(string transferId)
         {
             var getTransferStatus = await TransferWiseService.GetTransferStatus(transferId);
 
